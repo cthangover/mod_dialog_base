@@ -209,7 +209,7 @@ namespace Cthangover.Mods.Dialog
         /// </summary>
         public void NextAction()
 		{
-			if (Runtime.IsWaitAnswer)
+			if (Runtime.IsHeld || Runtime.IsWaitAnswer)
 				return;
 			if (Runtime.IsEnd)
 			{
@@ -242,7 +242,7 @@ namespace Cthangover.Mods.Dialog
 		/// <summary>Advances the dialog on <c>ui_accept</c> or on a click outside the body, unless a choice is pending or the queue has ended.</summary>
 		protected override void OnInput(InputEvent @event)
 		{
-			if (Runtime.IsEnd || Runtime.IsWaitAnswer)
+			if (Runtime.IsHeld || Runtime.IsEnd || Runtime.IsWaitAnswer)
 				return;
 
 			if (@event.IsActionPressed("ui_accept"))
@@ -267,6 +267,40 @@ namespace Cthangover.Mods.Dialog
 					}
 				}
 			}
+        }
+
+        /// <summary>
+        /// Continues a dialog the debugger held (<see cref="DialogRuntime.IsHeld"/>):
+        /// runs from the held action on, exactly as if it had never stopped.
+        /// Does nothing when the runtime is not held.
+        /// </summary>
+        public void Resume()
+        {
+            if (!Runtime.IsHeld)
+                return;
+
+            Runtime.IsHeld = false;
+            Runtime.Run();
+            ScheduleWaitTimer();
+        }
+
+        /// <summary>
+        /// Stops the running dialog without finishing it (<see cref="DialogRuntime.Abort"/>)
+        /// and frees the box for another queue: closes the answer box, hides
+        /// and releases the locker. The scenario does not count as completed.
+        /// </summary>
+        public void Abort()
+        {
+            ClearWaitTimer();
+            if (answerBox != null)
+            {
+                answerBox.Hide();
+                answerBox = null;
+            }
+
+            Runtime.Abort();
+            Hide();
+            Locker = null;
         }
 
         /// <summary>Whether a dialog is currently running (Locker is not null).</summary>

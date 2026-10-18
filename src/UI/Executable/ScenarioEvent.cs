@@ -81,6 +81,23 @@ namespace Cthangover.Mods.Dialog.Executable
         /// </summary>
         public override string ID => ScenarioId ?? base.ID;
 
+        /// <summary>
+        /// Mod (or content overlay) the scenario text was read from; null for
+        /// generated text (test play, inline scenarios). With <see cref="SourcePath"/>
+        /// it lets debugging tools open and edit the file behind a running event.
+        /// </summary>
+        public string SourceModId { get; set; }
+
+        /// <summary>Mod-relative path of the scenario file; see <see cref="SourceModId"/>.</summary>
+        public string SourcePath { get; set; }
+
+        /// <summary>
+        /// Label (<c>:name</c> in the script, without the colon) to start at
+        /// instead of the first line. Used to restart a scenario from where an
+        /// edited part begins; an unknown label falls back to the start.
+        /// </summary>
+        public string StartLabel { get; set; }
+
         protected override void CreateDialog(DialogQueue dlg)
         {
             if (LightUseTime.HasValue)
@@ -109,6 +126,22 @@ namespace Cthangover.Mods.Dialog.Executable
 
             foreach (var obj in loaded.RuntimeObjectList)
                 dlg.RuntimeObjectList.Add(obj);
+        }
+
+        /// <summary>Index of the <see cref="StartLabel"/> point in the built queue, or 0.</summary>
+        protected override int StartIndex(DialogQueue dlg)
+        {
+            if (string.IsNullOrEmpty(StartLabel))
+                return 0;
+
+            for (var i = 0; i < dlg.Queue.Count; i++)
+            {
+                if (dlg.Queue[i]?.ID == StartLabel)
+                    return i;
+            }
+
+            GameLogger.Log("SCENE", $"ScenarioEvent '{ID}': start label '{StartLabel}' not found, starting from the top", LogLevel.Warning);
+            return 0;
         }
 
         private long _cachedVersion = long.MinValue;
