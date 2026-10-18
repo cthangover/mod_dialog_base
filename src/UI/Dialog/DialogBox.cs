@@ -247,6 +247,8 @@ namespace Cthangover.Mods.Dialog
 
 			if (@event.IsActionPressed("ui_accept"))
 			{
+				if (IsTyping())
+					return;
 				GameLogger.Log("DIALOG", "input: advancing dialog");
 				NextAction();
 			}
@@ -256,6 +258,9 @@ namespace Cthangover.Mods.Dialog
 				if (action == null || action.WaitType == WaitType.WaitTime || action.WaitType == WaitType.WaitEvent)
 					return;
 				
+				if (IsOverOtherControl())
+					return;
+
 				if (Body is Control bodyControl)
 				{
 					var bodyRect = bodyControl.GetGlobalRect();
@@ -267,6 +272,25 @@ namespace Cthangover.Mods.Dialog
 					}
 				}
 			}
+        }
+
+        /// <summary>
+        /// True while a text field has keyboard focus: Enter and Space belong to
+        /// it, not to the dialog (the dialog reads <c>ui_accept</c> in
+        /// <c>_Input</c>, before the GUI).
+        /// </summary>
+        private bool IsTyping() => GetViewport()?.GuiGetFocusOwner() is LineEdit or TextEdit;
+
+        /// <summary>
+        /// True when the mouse is over a control that is not part of this box and
+        /// stops the mouse (a tool panel, a button drawn over the dialog area):
+        /// the click is meant for that control.
+        /// </summary>
+        private bool IsOverOtherControl()
+        {
+            var hovered = GetViewport()?.GuiGetHoveredControl();
+            return hovered != null && hovered != this && !IsAncestorOf(hovered)
+                && hovered.MouseFilter == MouseFilterEnum.Stop;
         }
 
         /// <summary>
