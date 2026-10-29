@@ -19,9 +19,9 @@ namespace Cthangover.Mods.Dialog.Tests
             var stage = await DialogStage.Create();
             var view = stage.AddViewBox();
             await DialogStage.Frames(1);
+            var frames = Frames(3);
             try
             {
-                var frames = Frames(3);
                 var anim = new ActionAnimatedForeground { Textures = frames, Speed = 20f, NextFrameSpeed = 20f, IsLoop = false };
                 var dlg = new DialogQueue();
                 dlg.Queue.Add(anim);
@@ -38,6 +38,7 @@ namespace Cthangover.Mods.Dialog.Tests
             finally
             {
                 stage.Free();
+                foreach (var texture in frames) texture.Dispose();
             }
         }
 
@@ -47,9 +48,9 @@ namespace Cthangover.Mods.Dialog.Tests
             var stage = await DialogStage.Create();
             var view = stage.AddViewBox();
             await DialogStage.Frames(1);
+            var frames = Frames(2);
             try
             {
-                var frames = Frames(2);
                 var anim = new ActionAnimatedForeground { Textures = frames, Speed = 20f, NextFrameSpeed = 20f, IsLoop = true };
                 var dlg = new DialogQueue();
                 dlg.Queue.Add(anim);
@@ -68,6 +69,7 @@ namespace Cthangover.Mods.Dialog.Tests
             finally
             {
                 stage.Free();
+                foreach (var texture in frames) texture.Dispose();
             }
         }
 
@@ -75,7 +77,10 @@ namespace Cthangover.Mods.Dialog.Tests
         {
             var list = new List<Texture2D>();
             for (var i = 0; i < count; i++)
-                list.Add(ImageTexture.CreateFromImage(Image.CreateEmpty(2, 2, false, Image.Format.Rgba8)));
+            {
+                using var image = Image.CreateEmpty(2, 2, false, Image.Format.Rgba8);
+                list.Add(ImageTexture.CreateFromImage(image));
+            }
             return list;
         }
     }
