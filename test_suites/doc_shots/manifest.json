@@ -1,0 +1,7 @@
+{
+  "name": "Documentation Screenshots",
+  "description": "Plays a steps file (scene switches, clock, dialog answers, panels, keys, inventory/party seeding) in the running game and saves a screenshot at every 'shot' step for mod documentation. Activated by --itest=doc_shots with --doc-steps=<file> and --shots=<dir> (windowed runs only).",
+  "sources": [
+    "src/*.cs"
+  ]
+}
