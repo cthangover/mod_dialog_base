@@ -35,7 +35,8 @@ namespace Cthangover.Mods.Dialog.Scenarios
         {
             var condition = string.Join(" ", positional);
             named.TryGetValue("else", out var otherwise);
-            dlg.IfGoTo(() => ScenarioCondition.Evaluate(condition), Label(arrowTarget), Label(otherwise));
+            var branch = dlg.IfGoTo(null, Label(arrowTarget), Label(otherwise));
+            branch.ScopedCondition = scope => ScenarioCondition.Evaluate(condition, scope);
         }
 
         private static string Label(string target) => string.IsNullOrWhiteSpace(target) ? null : target.Trim().TrimStart(':');

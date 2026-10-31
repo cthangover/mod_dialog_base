@@ -18,6 +18,7 @@ using Cthangover.Core.Interactive;
 
 namespace Cthangover.Mods.Dialog
 {
+    using Cthangover.Core.Events;
     /// <summary>
     /// The visible dialog UI: dual avatars with shader-based hide-color mode,
     /// answer box spawning, and click/keyboard advance. Validates that no existing
@@ -47,6 +48,7 @@ namespace Cthangover.Mods.Dialog
 		protected override void OnReady()
 		{
 			MouseFilter = MouseFilterEnum.Ignore;
+			ModEventBus.Subscribe<SceneExitedEvent>(OnSceneExited);
 
 			if (Body == null)
 			{
@@ -371,6 +373,26 @@ namespace Cthangover.Mods.Dialog
             Runtime.Abort();
             Hide();
             Locker = null;
+        }
+
+        /// <summary>Detaches the scene-exit hook when the box leaves the tree.</summary>
+        protected override void OnExitTree()
+        {
+            ModEventBus.Unsubscribe<SceneExitedEvent>(OnSceneExited);
+        }
+
+        /// <summary>
+        /// Leaving a logical scene ends a dialog that is still running in it. The box belongs to the shell and
+        /// survives scene switches, so nothing else would release its locker: a switch in the middle of a dialog
+        /// would keep the box busy, and the next scene's events and the player's walking would wait for it. The
+        /// dialog is aborted, not finished: its end actions and <see cref="DialogEndedEvent"/> do not run.
+        /// </summary>
+        private void OnSceneExited(SceneExitedEvent evt)
+        {
+            if (!IsRunning)
+                return;
+            GameLogger.Log("DIALOG", $"scene '{evt.SceneName}' left during a dialog ('{Locker?.ID ?? "click dialog"}'): dialog aborted", LogLevel.Warning);
+            Abort();
         }
 
         /// <summary>

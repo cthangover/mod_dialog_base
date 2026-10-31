@@ -8,6 +8,8 @@ namespace Cthangover.Mods.Dialog.Action.Impls
     /// flag is game state: it is saved, read by scenario conditions
     /// (<c>condition: door == "open"</c>) and its change rescans the scene's
     /// event chain, so a scenario waiting for it can start right after.
+    /// <c>flag self.open 1</c> writes the flag of the dialog's instance scope
+    /// (<see cref="DialogQueue.Scope"/>), e.g. <c>rpg_village/supply_1:open</c>.
     /// </summary>
     public class ActionSetFlag : ActionCommand
     {
@@ -20,6 +22,11 @@ namespace Cthangover.Mods.Dialog.Action.Impls
         public override WaitType WaitType { get; set; } = WaitType.NoWait;
 
         /// <inheritdoc/>
-        public override void DoRun(DialogRuntime runtime) => ScenarioCondition.SetFlag(Name, Value ?? string.Empty);
+        public override void DoRun(DialogRuntime runtime)
+        {
+            var key = ScenarioCondition.FlagKey(Name, runtime?.Dialog?.Scope);
+            if (key != null)
+                ScenarioCondition.SetFlag(key, Value ?? string.Empty);
+        }
     }
 }

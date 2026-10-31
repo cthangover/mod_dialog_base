@@ -48,7 +48,8 @@ namespace Cthangover.Mods.Dialog.Action.Impls
             if (dialogBox == null)
                 return;
 
-            var shown = Variants.Where(v => v.IsShown()).ToList();
+            var scope = runtime.Dialog?.Scope;
+            var shown = Variants.Where(v => v.IsShown(scope)).ToList();
             WaitType = shown.Count == 0 ? WaitType.NoWait : WaitType.WaitSelect;
             if (shown.Count == 0)
             {

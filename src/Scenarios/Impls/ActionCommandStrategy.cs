@@ -38,7 +38,7 @@ namespace Cthangover.Mods.Dialog.Scenarios
             foreach (var kv in named)
             {
                 if (kv.Key is "name" or "key") continue;
-                dlg.Set(kv.Key, kv.Value);
+                dlg.Set(kv.Key, kv.Value).UseProcessText = true;
             }
 
             dlg.Action(actionName);

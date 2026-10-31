@@ -81,6 +81,35 @@ namespace Cthangover.Mods.Dialog
         /// <summary>Queue index of <see cref="CurrentAction"/>.</summary>
         public int Index => index;
 
+        /// <summary>Inject a seeded generator for reproducible scripts and tests; expressions never roll while parsing.</summary>
+        public System.Random ExpressionRandom { get; set; } = System.Random.Shared;
+        public string LastExpressionError { get; private set; }
+
+        /// <summary>Abort a malformed calculation without completing a one-run scenario or running later reward actions.</summary>
+        public void FailExpression(string message, int sourceLine = 0)
+        {
+            var scenario = DialogBox?.Locker as Cthangover.Mods.Dialog.Executable.ScenarioEvent;
+            var origin = scenario?.SourcePath ?? DialogBox?.Locker?.ID ?? "<inline>";
+            LastExpressionError = origin + ":" + sourceLine + ": " + message;
+            GameLogger.Log("DIALOG", LastExpressionError, LogLevel.Error);
+            if (DialogBox != null) DialogBox.Abort(); else Abort();
+        }
+
+        /// <summary>Resolve action parameters at execution, preserving string values and rejecting undefined references.</summary>
+        public string ProcessParameter(string text)
+        {
+            if (text == null) return null;
+            var names = text.GetIncludesInQuotes("${", "}");
+            if (names != null)
+                foreach (var name in names)
+                {
+                    if (!variables.TryGetValue(name, out var value))
+                        throw new Cthangover.Mods.Expressions.ExpressionEvaluationException("Undefined action parameter variable: " + name);
+                    text = text.Replace("${" + name + "}", value);
+                }
+            return text;
+        }
+
         /// <summary>Current <c>${name}</c> variables of the dialog, for inspection.</summary>
         public IReadOnlyDictionary<string, string> Variables => (IReadOnlyDictionary<string, string>)variables;
 
@@ -153,6 +182,7 @@ namespace Cthangover.Mods.Dialog
 
             generation++;
             variables = new Dictionary<string, string>();
+            LastExpressionError = null;
             DialogBox = dialogBox;
             IsHeld = false;
             isLastGoTo = false;

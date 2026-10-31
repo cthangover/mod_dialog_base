@@ -23,6 +23,13 @@ namespace Cthangover.Mods.Dialog.Action.Impls
     {
         /// <summary>Delegate evaluated at runtime. Must return true/false to select the branch target.</summary>
         public Func<bool> Condition { get; set; }
+
+        /// <summary>
+        /// Used instead of <see cref="Condition"/> when set: evaluated with the instance scope of the
+        /// running dialog (<see cref="DialogQueue.Scope"/>), so <c>when "self.open == 1"</c> reads the flag of
+        /// the object that started the dialog, even when the line was parsed into another queue first.
+        /// </summary>
+        public Func<string, bool> ScopedCondition { get; set; }
         /// <summary>Target action ID if <see cref="Condition"/> returns true. Empty or null causes fall-through.</summary>
         public string TrueGoTo { get; set; }
         /// <summary>Target action ID if <see cref="Condition"/> returns false. Empty or null causes fall-through.</summary>
@@ -34,13 +41,13 @@ namespace Cthangover.Mods.Dialog.Action.Impls
         /// <summary>Evaluates <see cref="Condition"/> and jumps to <see cref="TrueGoTo"/> or <see cref="FalseGoTo"/>; an empty target falls through to the next action.</summary>
         public override void DoRun(DialogRuntime runtime)
         {
-            if (Condition == null)
+            if (Condition == null && ScopedCondition == null)
             {
                 GameLogger.Log("DIALOG", "ActionIf: Condition delegate is null", LogLevel.Error);
                 return;
             }
 
-            var result = Condition();
+            var result = ScopedCondition != null ? ScopedCondition(runtime?.Dialog?.Scope) : Condition();
             var goTo = result ? TrueGoTo : FalseGoTo;
 
             if (!string.IsNullOrEmpty(goTo))

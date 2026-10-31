@@ -159,6 +159,46 @@
           "Description": "dialog/schema/builtin/option_if_desc"
         }
       ]
+    },
+    {
+      "Id": "set",
+      "Name": "dialog/schema/builtin/set",
+      "Description": "dialog/schema/builtin/set_desc",
+      "Category": "flow",
+      "Positional": [
+        {
+          "Key": "name",
+          "Type": "text",
+          "Required": true,
+          "Name": "dialog/schema/field/variable"
+        },
+        {
+          "Key": "value",
+          "Type": "text",
+          "Required": true,
+          "Name": "dialog/schema/field/value"
+        }
+      ]
+    },
+    {
+      "Id": "cset",
+      "Name": "dialog/schema/builtin/cset",
+      "Description": "dialog/schema/builtin/cset_desc",
+      "Category": "flow",
+      "Positional": [
+        {
+          "Key": "name",
+          "Type": "text",
+          "Required": true,
+          "Name": "dialog/schema/field/variable"
+        },
+        {
+          "Key": "value",
+          "Type": "expression",
+          "Required": true,
+          "Name": "dialog/schema/field/expression"
+        }
+      ]
     }
   ]
 }

@@ -13,7 +13,6 @@ using Cthangover.Core.UI.Executable;
 using Cthangover.Core.Scenarios;
 using Cthangover.Core.Scenes;
 using Cthangover.Core.Interactive;
-using Cthangover.Mods.Map;
 using Cthangover.Mods.Time;
 
 namespace Cthangover.Mods.Dialog
@@ -70,12 +69,12 @@ namespace Cthangover.Mods.Dialog
         /// </summary>
         public IInventory        Inventory   { get; }
         /// <summary>
-        /// Map zone control. Stateless adapter over the
-        /// <c>MapZoneService</c> singleton, which owns the actual state;
-        /// safe to instantiate per-context like the quest service, because the
-        /// state does not live in the adapter.
+        /// Map zone control, resolved from the kernel slot
+        /// <see cref="MapZoneServiceRegistry"/> that the map_base engine mod
+        /// fills (the dialog engine does not depend on the map). <c>null</c>
+        /// in games without the world map, where no <c>map.*</c> action exists.
         /// </summary>
-        public IMapZoneService   Map         { get; } = new MapZoneServiceImpl();
+        public IMapZoneService   Map         => MapZoneServiceRegistry.Provider;
 
         /// <summary>
         /// Creates a context wired to the given DialogRuntime. The

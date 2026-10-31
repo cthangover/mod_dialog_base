@@ -97,3 +97,7 @@ Scenarios of all mods are collected together. A mod adds a story to someone else
 2. **The line is shown in the wrong language.** The `key=` is missing from the mod's `locale` files for that language; the quoted text is shown instead.
 3. **An answer leads nowhere.** The label after `->` must exist in the same file, written with a colon (`:bar`).
 4. **An `action` does nothing.** The mod that owns the action is not part of the game (the log says the action "is not registered"), or a parameter name is wrong — compare it with the action in the scenario editor of Editor Tools.
+
+## Shared expressions
+
+Numeric expressions are supplied by `expressions_base`. Use `set money=rnd(3,5)` or `cset total "1+2+${money}"`; reuse `${money}` in localized text and action parameters. `set name value` still stores a literal string. See the [Expression Engine guide](../../expressions_base/docs/en.md) for syntax, strict assignments and mod-defined strategies.

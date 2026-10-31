@@ -144,6 +144,7 @@ namespace Cthangover.Mods.Dialog.Scenarios
                 return null;
 
             var cmd = tokens[0].ToLowerInvariant();
+            var spec = ScenarioCommandStrategyFactory.Get(cmd) as IScenarioCommandSpec;
             for (var i = 1; i < tokens.Count; i++)
             {
                 var t = tokens[i];
@@ -163,7 +164,7 @@ namespace Cthangover.Mods.Dialog.Scenarios
                     var name = t.Substring(0, eqIdx);
                     if (IsValidIdent(name))
                     {
-                        named[name.ToLowerInvariant()] = t.Substring(eqIdx + 1);
+                        named[spec?.PreserveNamedArgumentCase == true ? name : name.ToLowerInvariant()] = t.Substring(eqIdx + 1);
                         continue;
                     }
                 }
@@ -242,39 +243,34 @@ namespace Cthangover.Mods.Dialog.Scenarios
 
         private static List<string> Tokenize(string line)
         {
-            var result = new List<string>();
-            var i = 0;
-
-            while (i < line.Length)
+            var tokens=new List<string>();
+            var i=0;
+            while(i<line.Length)
             {
-                if (char.IsWhiteSpace(line[i]))
+                if(char.IsWhiteSpace(line[i])){i++;continue;}
+                var token=new System.Text.StringBuilder();
+                while(i<line.Length&&!char.IsWhiteSpace(line[i]))
                 {
-                    i++;
-                    continue;
-                }
-
-                if (line[i] == '"')
-                {
-                    i++;
-                    var start = i;
-                    while (i < line.Length && line[i] != '"')
+                    // Preserve quotes embedded in JSON. Quotes at the start of a value, including name="...",
+                    // delimit one DSL argument and allow spaces without changing existing JSON commands.
+                    var quoted=false;
+                    if(line[i]=='"')
                     {
-                        if (line[i] == '\\' && i + 1 < line.Length)
-                            i++;
-                        i++;
+                        var prefix=token.ToString();
+                        quoted=token.Length==0||prefix.EndsWith("=")&&IsValidIdent(prefix.Substring(0,prefix.Length-1));
                     }
-                    result.Add(line[start..i].Replace("\\\"", "\""));
-                    if (i < line.Length) i++;
-                    continue;
-                }
-
-                var tokenStart = i;
-                while (i < line.Length && !char.IsWhiteSpace(line[i]))
+                    if(!quoted){token.Append(line[i++]);continue;}
                     i++;
-                result.Add(line[tokenStart..i]);
+                    while(i<line.Length&&line[i]!='"')
+                    {
+                        if(line[i]==(char)92&&i+1<line.Length&&line[i+1]=='"'){token.Append('"');i+=2;}
+                        else token.Append(line[i++]);
+                    }
+                    if(i<line.Length)i++;
+                }
+                tokens.Add(token.ToString());
             }
-
-            return result;
+            return tokens;
         }
 
         private static bool IsValidIdent(string s)

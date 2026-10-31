@@ -2,6 +2,7 @@ namespace Cthangover.Mods.Dialog.Tests
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Cthangover.Core.Events;
     using Cthangover.Core.Mods.Testing;
     using Cthangover.Core.Settings;
     using Cthangover.Mods.Dialog.Action.Impls;
@@ -42,6 +43,30 @@ namespace Cthangover.Mods.Dialog.Tests
                 var other = new DialogQueue();
                 other.Queue.Add(new ProbeAction());
                 ModAssert.False(stage.Box.SetDialogQueueAndRun(other, null, 0, null), "a second click dialog is refused too");
+            }
+            finally
+            {
+                stage.Free();
+            }
+        }
+
+        [ModTest("box/scene_exit_ends_running_dialog", TimeoutSeconds = 10)]
+        static async Task SceneExitEndsRunningDialog(ModTestContext ctx)
+        {
+            var stage = await DialogStage.Create();
+            try
+            {
+                var running = new DialogQueue();
+                running.Queue.Add(new ProbeAction());
+                ModAssert.True(stage.Box.SetDialogQueueAndRun(running, null, 0, null), "a dialog starts");
+                ModAssert.True(stage.Box.IsRunning, "the dialog occupies the box");
+
+                ModEventBus.Publish(new SceneExitedEvent { SceneName = "dialog_base_test_scene" });
+                ModAssert.False(stage.Box.IsRunning, "leaving the scene releases the box");
+
+                var next = new DialogQueue();
+                next.Queue.Add(new ProbeAction());
+                ModAssert.True(stage.Box.SetDialogQueueAndRun(next, null, 0, null), "the next scene's dialog starts on the freed box");
             }
             finally
             {

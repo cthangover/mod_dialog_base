@@ -24,6 +24,15 @@ namespace Cthangover.Mods.Dialog.Scenarios
     /// </summary>
     public interface IScenarioCommandSpec
     {
+        /// <summary>Assignment variable names retain their case; ordinary named parameters remain case insensitive.</summary>
+        bool PreserveNamedArgumentCase => false;
+
+        /// <summary>Optional command-owned semantic validation, shared by runtime construction and static author tools.</summary>
+        string ValidateArguments(List<string> positional, Dictionary<string,string> named, string arrowTarget) => null;
+
+        /// <summary>Normalize a copy of parsed arguments to the canonical schema form; runtime syntax stays untouched.</summary>
+        void NormalizeArguments(List<string> positional, Dictionary<string, string> named) { }
+
         /// <summary>Minimum number of positional arguments. Default: 0.</summary>
         int MinPositional => 0;
 

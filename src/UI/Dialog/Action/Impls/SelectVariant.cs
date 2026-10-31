@@ -30,8 +30,8 @@ namespace Cthangover.Mods.Dialog.Action.Impls
         /// </summary>
         public string Condition { get; set; }
 
-        /// <summary>Whether the option is offered now.</summary>
-        public bool IsShown() => string.IsNullOrWhiteSpace(Condition) || ScenarioCondition.Evaluate(Condition);
+        /// <summary>Whether the option is offered now; <paramref name="scope"/> is the dialog's instance scope (<see cref="DialogQueue.Scope"/>, may be null).</summary>
+        public bool IsShown(string scope) => string.IsNullOrWhiteSpace(Condition) || ScenarioCondition.Evaluate(Condition, scope);
 
         /// <summary>Generates a new unique action ID for use as a GoTo target (e.g. with <see cref="DialogQueue.Point"/>).</summary>
         public static string Point => Guid.NewGuid().ToString();

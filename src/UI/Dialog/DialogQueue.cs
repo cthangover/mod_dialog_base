@@ -33,6 +33,15 @@ namespace Cthangover.Mods.Dialog
         /// <summary>The ordered sequence of dialog actions. Appended via fluent builder methods; consumed by <see cref="DialogRuntime"/>.</summary>
         public List<IActionCommand> Queue { get; } = new();
 
+        /// <summary>
+        /// The instance scope of this dialog — the placement id of the object whose interaction runs it —
+        /// or null. Inside it <c>self.&lt;name&gt;</c> in <c>flag</c>, <c>when</c> and option conditions means
+        /// the story flag <c>&lt;scope&gt;:&lt;name&gt;</c> (<see cref="ScenarioCondition.FlagKey"/>). Set by
+        /// whoever starts the dialog (the RPG runtime) before it runs; a queue with no scope rejects
+        /// <c>self.</c> with an ERROR instead of writing a global flag.
+        /// </summary>
+        public string Scope { get; set; }
+
         /// <summary>Spawns a visual effect identified by <paramref name="effectID"/> through <see cref="EffectFactory"/>. Returns the action for further configuration.</summary>
         public ActionEffect Effect(string effectID)
         {
@@ -130,6 +139,14 @@ namespace Cthangover.Mods.Dialog
             return action;
         }
         
+        /// <summary>Enqueues a strict numeric assignment; expressions and random functions are evaluated at execution.</summary>
+        public ActionCalculate Calculate(string name, string expression, string argumentError = null)
+        {
+            var action = new ActionCalculate { Name = name, Expression = expression, ArgumentError = argumentError };
+            Queue.Add(action);
+            return action;
+        }
+
         /// <summary>Sets a story flag of the game (saved, read by scenario conditions) when the queue reaches this point.</summary>
         public ActionSetFlag Flag(string name, string value)
         {

@@ -25,6 +25,8 @@ namespace Cthangover.Mods.Dialog.Action.Impls
         public string Value { get; set; }
         /// <summary>Lazy evaluation delegate. When non-null, invoked at runtime to compute the value dynamically.</summary>
         public Func<string> Callback { get; set; }
+        /// <summary>Only action parameter templates expand references; ordinary set literals retain their historical behavior.</summary>
+        public bool UseProcessText { get; set; }
 
         /// <summary>Variable assignment is instant — the dialog continues without pause.</summary>
         public override WaitType WaitType { get; set; } = WaitType.NoWait;
@@ -33,6 +35,12 @@ namespace Cthangover.Mods.Dialog.Action.Impls
         public override void DoRun(DialogRuntime runtime)
         {
             var val = Callback != null ? Callback() : Value;
+            if (UseProcessText)
+            {
+                try { val = runtime.ProcessParameter(val); }
+                catch (Cthangover.Mods.Expressions.ExpressionEvaluationException ex)
+                { runtime.FailExpression(ex.Message, SourceLine); return; }
+            }
             runtime.SetVariable(Name, val ?? string.Empty);
         }
     }
