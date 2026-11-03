@@ -29,7 +29,7 @@ namespace Cthangover.Mods.Dialog.Scenarios
         /// <inheritdoc/>
         public int MaxPositional => 1;
         /// <inheritdoc/>
-        public IReadOnlyList<string> AllowedNamed => new[] { "key", "first", "second", "hide_color", "wait" };
+        public IReadOnlyList<string> AllowedNamed => new[] { "key", "first", "second", "hide_color", "wait", "who", "duration", "cue" };
 
         /// <inheritdoc/>
         public void Execute(DialogQueue dlg, List<string> positional, Dictionary<string, string> named, string arrowTarget, ILocalizationProvider locale)
@@ -46,6 +46,17 @@ namespace Cthangover.Mods.Dialog.Scenarios
             var hideColor = named.TryGetValue("hide_color", out var hc) && hc == "true";
 
             var action = dlg.Text(textVal, first, second, hideColor);
+            action.FallbackText = positional.Count > 0 ? positional[0] : "";
+            action.LocaleKey = key;
+            action.Speaker = named.TryGetValue("who", out var who) ? who : null;
+            action.Cue = named.TryGetValue("cue", out var cue) ? cue : null;
+            if (named.TryGetValue("duration", out var duration))
+            {
+                if (!double.TryParse(duration, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var seconds)
+                    || !double.IsFinite(seconds) || seconds <= 0)
+                    throw new System.FormatException("duration must be a positive finite number");
+                action.Duration = seconds;
+            }
 
             if (named.TryGetValue("wait", out var wait) && wait == "false")
                 action.WaitType = WaitType.NoWait;

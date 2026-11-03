@@ -27,9 +27,12 @@ namespace Cthangover.Mods.Dialog
     /// it may not exist at the moment of context creation (e.g. before game data
     /// is fully loaded).
     /// </summary>
-    internal class ScenarioActionContext : IActionContext
+    internal class ScenarioActionContext : IActionContext, IHostedScenarioContext
     {
         private readonly DialogRuntime runtime;
+
+        /// <summary>Host services belong to the runtime that invoked this action.</summary>
+        public IScenarioExecutionHost Host => runtime.Host;
 
         /// <summary>
         /// Service accessor for quest operations. Resolved from the kernel

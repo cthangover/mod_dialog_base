@@ -51,6 +51,13 @@ namespace Cthangover.Mods.Dialog
         /// <summary>The currently active dialog queue. Set by <see cref="SetDialogQueueAndRun"/>.</summary>
         public DialogQueue Dialog    { get; set; }
 
+        /// <summary>Optional per-execution host; null preserves modal dialog behavior.</summary>
+        public IScenarioExecutionHost Host { get; set; }
+
+        /// <summary>Conditions use live host roles when present, otherwise the existing instance scope.</summary>
+        public bool EvaluateCondition(string text) => Host != null
+            ? Host.EvaluateCondition(text) : ScenarioCondition.Evaluate(text, Dialog?.Scope);
+
         /// <summary>The action at the current queue index. Automatically constructs it if <see cref="ConstructType"/> is OnStartAction and it hasn't been constructed yet.</summary>
         public IActionCommand CurrentAction => GetByIndex(index);
 
@@ -70,6 +77,9 @@ namespace Cthangover.Mods.Dialog
         /// null check per action.
         /// </summary>
         public static IDialogDebugger Debugger { get; set; }
+
+        /// <summary>A host may debug its own execution independently of the modal studio hook.</summary>
+        public IDialogDebugger ExecutionDebugger { get; set; }
 
         /// <summary>
         /// True while the debugger holds the runtime before <see cref="CurrentAction"/>:
@@ -276,7 +286,7 @@ namespace Cthangover.Mods.Dialog
 
                 GameLogger.Log("DIALOG", $"Run: idx={index}/{dialogQueue.Count-1} type={action.GetType().Name} wait={action.WaitType}", LogLevel.Debug);
 
-                if (Debugger != null && Debugger.ShouldHold(this, action))
+                if ((ExecutionDebugger ?? Debugger)?.ShouldHold(this, action) == true)
                 {
                     IsHeld = true;
                     return;
@@ -286,6 +296,11 @@ namespace Cthangover.Mods.Dialog
                 if (runGeneration != generation)
                     return;
 
+                if (Host != null && iteration > 256)
+                {
+                    FailExpression("Hosted scenario exceeded the immediate-action budget");
+                    return;
+                }
                 if (iteration++ > 100000)
                 {
                     GameLogger.Log("DIALOG", "Run: infinite loop protection (100k iterations)", LogLevel.Warning);
@@ -398,6 +413,7 @@ namespace Cthangover.Mods.Dialog
             dialogQueue    = null;
             endDialogQueue = null;
             index          = 0;
+            Host?.Finished(false);
 
             if (DialogBox != null)
             {
@@ -427,6 +443,7 @@ namespace Cthangover.Mods.Dialog
             index = 0;
             isLastGoTo = false;
             IsHeld = false;
+            Host?.Finished(true);
             GameLogger.Log("DIALOG", "Abort: queue dropped without ending");
         }
 

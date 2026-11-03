@@ -25,7 +25,7 @@ namespace Cthangover.Mods.Dialog.Scenarios
         public int MinPositional => 1;
 
         /// <inheritdoc />
-        public IReadOnlyList<string> AllowedNamed => new[] { "else" };
+        public IReadOnlyList<string> AllowedNamed => new[] { "else", "wait", "timeout" };
 
         /// <inheritdoc />
         public string JumpTargetNamedKey => "else";
@@ -35,8 +35,21 @@ namespace Cthangover.Mods.Dialog.Scenarios
         {
             var condition = string.Join(" ", positional);
             named.TryGetValue("else", out var otherwise);
+            if (named.TryGetValue("wait", out var wait) && wait == "true")
+            {
+                if (!named.TryGetValue("timeout", out var timeout) || !double.TryParse(timeout,
+                    System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var seconds)
+                    || !double.IsFinite(seconds) || seconds <= 0)
+                    throw new System.FormatException("when wait=true requires a positive finite timeout");
+                dlg.Queue.Add(new Cthangover.Mods.Dialog.Action.Impls.ActionWaitCondition
+                {
+                    ConditionText = condition, Timeout = seconds,
+                    TrueTarget = Label(arrowTarget), TimeoutTarget = Label(otherwise),
+                });
+                return;
+            }
             var branch = dlg.IfGoTo(null, Label(arrowTarget), Label(otherwise));
-            branch.ScopedCondition = scope => ScenarioCondition.Evaluate(condition, scope);
+            branch.ConditionText = condition;
         }
 
         private static string Label(string target) => string.IsNullOrWhiteSpace(target) ? null : target.Trim().TrimStart(':');

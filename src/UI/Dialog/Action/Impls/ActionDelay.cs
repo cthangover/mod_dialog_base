@@ -32,6 +32,11 @@ namespace Cthangover.Mods.Dialog.Action.Impls
         /// <summary>Shows the optional <see cref="ShowText"/> and, in <see cref="HiddenMode"/>, hides the dialog body for the pause duration.</summary>
         public override void DoRun(DialogRuntime runtime)
         {
+            if (runtime.Host != null)
+            {
+                runtime.Host.Delay(this, runtime);
+                return;
+            }
             var dialogBox = runtime.DialogBox;
             if (dialogBox == null)
                 return;

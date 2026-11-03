@@ -21,6 +21,16 @@ namespace Cthangover.Mods.Dialog.Action.Impls
     {
         /// <summary>The dialog text to display. Supports ${var} substitution when <see cref="UseProcessText"/> is true.</summary>
         public string Text { get; set; }
+        /// <summary>Untranslated source retained for live locale changes in hosted speech.</summary>
+        public string FallbackText { get; set; }
+        /// <summary>Stable translation key, independent of speech event cues.</summary>
+        public string LocaleKey { get; set; }
+        /// <summary>Host role naming the concrete speaker.</summary>
+        public string Speaker { get; set; }
+        /// <summary>Optional semantic event emitted when this utterance finishes normally.</summary>
+        public string Cue { get; set; }
+        /// <summary>Explicit host-clock duration; null uses translated text length.</summary>
+        public double? Duration { get; set; }
         /// <summary>Left avatar sprite ID resolved through <see cref="IAvatarProvider"/>. Null or empty hides the slot.</summary>
         public string FirstAvatar { get; set; }
         /// <summary>Right avatar sprite ID resolved through <see cref="IAvatarProvider"/>. Null or empty hides the slot.</summary>
@@ -36,6 +46,11 @@ namespace Cthangover.Mods.Dialog.Action.Impls
         /// <summary>Sets the dialog text (optionally variable-substituted) and both avatar slots, then waits for the player's click.</summary>
         public override void DoRun(DialogRuntime runtime)
         {
+            if (runtime.Host != null)
+            {
+                runtime.Host.ShowText(this, runtime);
+                return;
+            }
             var dialogBox = runtime.DialogBox;
             if (dialogBox == null)
                 return;

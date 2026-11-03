@@ -18,6 +18,18 @@
           "Key": "key",
           "Type": "text",
           "Name": "dialog/schema/field/locale_key"
+        },
+        {
+          "Key": "who",
+          "Type": "text"
+        },
+        {
+          "Key": "duration",
+          "Type": "number"
+        },
+        {
+          "Key": "cue",
+          "Type": "text"
         }
       ]
     },
@@ -39,6 +51,18 @@
           "Key": "key",
           "Type": "text",
           "Name": "dialog/schema/field/locale_key"
+        },
+        {
+          "Key": "who",
+          "Type": "text"
+        },
+        {
+          "Key": "duration",
+          "Type": "number"
+        },
+        {
+          "Key": "cue",
+          "Type": "text"
         }
       ]
     },
@@ -109,6 +133,14 @@
           "Key": "else",
           "Type": "label",
           "Name": "dialog/schema/field/else"
+        },
+        {
+          "Key": "wait",
+          "Type": "bool"
+        },
+        {
+          "Key": "timeout",
+          "Type": "number"
         }
       ]
     },
