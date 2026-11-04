@@ -97,3 +97,13 @@ Los escenarios de todos los mods se reúnen en un mismo conjunto. Un mod añade 
 2. **La línea aparece en otro idioma.** Falta la clave `key=` en los archivos `locale` del mod para ese idioma, y se muestra el texto entrecomillado.
 3. **Una respuesta no lleva a ninguna parte.** La etiqueta tras `->` debe existir en el mismo archivo, escrita con dos puntos (`:bar`).
 4. **Una `action` no hace nada.** El mod dueño de la acción no forma parte del juego (el registro dice que la acción "is not registered") o hay un nombre de parámetro equivocado: compáralo con la acción en el editor de escenarios de Editor Tools.
+
+## Escenarios de fondo simultáneos
+
+`channel: ambient` usa `npc_barks_base` fuera del diálogo modal. Cada ejecución conserva sus variables, esperas, roles y depurador. Scenario Editor valida y guarda; F5 prueba el búfer. Studio → Background muestra definiciones y ejecuciones, con pausa, pasos, puntos de ruptura y reloj independientes.
+
+[npc_barks_base](../../npc_barks_base/docs/en.md)
+
+## Expresiones compartidas
+
+`expressions_base` aporta los cálculos: `set money=rnd(3,5)` guarda un entero inclusivo, `cset total "1+2+${money}"` calcula una expresión. `set name value` conserva texto literal. Los errores detienen el diálogo antes de las acciones dependientes. Véase la [guía del motor de expresiones](../../expressions_base/docs/en.md) para la sintaxis y las extensiones.

@@ -97,3 +97,13 @@ Kịch bản của mọi mod được gom chung với nhau. Một mod thêm câu
 2. **Câu thoại hiện sai ngôn ngữ.** Thiếu khóa `key=` trong các tệp `locale` của mod cho ngôn ngữ đó; văn bản trong ngoặc kép được hiển thị thay thế.
 3. **Lựa chọn dẫn đến hư không.** Nhãn sau `->` phải tồn tại trong cùng tệp, viết kèm dấu hai chấm (`:bar`).
 4. **`action` không làm gì cả.** Mod sở hữu hành động không có trong game (log ghi hành động "is not registered"), hoặc tên tham số sai — hãy so với hành động trong trình soạn thảo kịch bản của Editor Tools.
+
+## Kịch bản nền đồng thời
+
+`channel: ambient` chạy qua `npc_barks_base` ngoài hàng đợi hội thoại modal. Mỗi lần chạy có biến, chờ, vai trò và trình gỡ lỗi riêng. Scenario Editor kiểm tra/lưu; F5 chạy thử bộ đệm. Studio → Background liệt kê định nghĩa và lần chạy; tạm dừng, bước, điểm dừng và đồng hồ chỉ tác động lần chạy được chọn.
+
+[npc_barks_base](../../npc_barks_base/docs/en.md)
+
+## Biểu thức dùng chung
+
+`expressions_base` cung cấp phép tính: `set money=rnd(3,5)` lưu số nguyên gồm hai đầu mút, `cset total "1+2+${money}"` tính biểu thức. `set name value` vẫn lưu chuỗi nguyên văn. Lỗi dừng hội thoại trước hành động phụ thuộc. Xem [hướng dẫn bộ biểu thức](../../expressions_base/docs/en.md) về cú pháp và mở rộng.

@@ -97,3 +97,13 @@ save_allowed: true
 2. **대사가 다른 언어로 표시됩니다.** 해당 언어의 번역 키 `key=`가 mod의 `locale` 파일에 없어서 따옴표 안의 텍스트가 그대로 보입니다.
 3. **선택지가 어디로도 이어지지 않습니다.** `->` 뒤의 레이블은 같은 파일 안에 콜론을 붙여(`:bar`) 존재해야 합니다.
 4. **`action`이 아무것도 하지 않습니다.** 액션을 소유한 mod가 게임에 없거나(로그에 "is not registered"라고 기록됨), 매개변수 이름이 틀렸습니다. Editor Tools의 시나리오 편집기에서 해당 액션과 비교해 보세요.
+
+## 동시 배경 시나리오
+
+`channel: ambient`는 `npc_barks_base`를 통해 모달 대화 밖에서 실행됩니다. 각 실행의 변수, 대기, 역할, 디버거는 독립적입니다. 시나리오 편집기에서 검증하고 저장하며 F5로 버퍼를 미리 실행합니다. Studio → Background에서 정의와 실행을 선택해 개별 일시 정지, 단계 실행, 중단점, 시계를 제어합니다.
+
+[npc_barks_base](../../npc_barks_base/docs/en.md)
+
+## 공통 표현식
+
+`expressions_base`가 계산을 제공합니다. `set money=rnd(3,5)`는 양 끝을 포함한 정수, `cset total "1+2+${money}"`는 식의 결과를 저장합니다. `set name value`는 문자열을 그대로 저장합니다. 오류가 나면 의존 액션 전에 대화를 멈춥니다. 문법과 확장은 [표현식 엔진 가이드](../../expressions_base/docs/en.md)를 참고하세요.

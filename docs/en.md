@@ -101,3 +101,9 @@ Scenarios of all mods are collected together. A mod adds a story to someone else
 ## Shared expressions
 
 Numeric expressions are supplied by `expressions_base`. Use `set money=rnd(3,5)` or `cset total "1+2+${money}"`; reuse `${money}` in localized text and action parameters. `set name value` still stores a literal string. See the [Expression Engine guide](../../expressions_base/docs/en.md) for syntax, strict assignments and mod-defined strategies.
+
+## Concurrent background scenarios
+
+`channel: ambient` runs through `npc_barks_base` outside the modal dialog queue. Each execution has its own variables, waits, roles and debugger. Scenario Editor validates/saves the source and F5 previews its buffer. Studio → Background lists definitions and runs; pause, step, breakpoints and clock advance target one execution.
+
+[npc_barks_base](../../npc_barks_base/docs/en.md)

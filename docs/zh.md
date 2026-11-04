@@ -97,3 +97,13 @@ save_allowed: true
 2. **台词显示成了别的语言。** 该语言的翻译键 `key=` 在 mod 的 `locale` 文件里缺失，于是显示引号里的原文。
 3. **选项跳了个空。** `->` 后面的标签必须存在于同一文件中，并带冒号（`:bar`）。
 4. **`action` 没有反应。** 动作所属的 mod 不在游戏内（日志提示动作 "is not registered"），或者参数名写错——与 Editor Tools 剧本编辑器中的动作对照一下。
+
+## 并发背景剧本
+
+`channel: ambient` 由 `npc_barks_base` 在模态对话队列之外执行。每次执行都有独立变量、等待、角色和调试器。剧本编辑器验证并保存，F5 预览当前缓冲区。Studio → Background 分别列出定义与执行；暂停、单步、断点和时钟只针对选中的执行。
+
+[npc_barks_base](../../npc_barks_base/docs/en.md)
+
+## 共享表达式
+
+`expressions_base` 提供计算：`set money=rnd(3,5)` 保存含端点的随机整数，`cset total "1+2+${money}"` 计算表达式。`set name value` 仍保存字面文本。错误会在后续依赖动作执行前停止对话。语法及扩展见[表达式引擎指南](../../expressions_base/docs/en.md)。
