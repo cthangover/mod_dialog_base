@@ -8,6 +8,6 @@
     "scripts/*.gd"
   ],
   "depends": [
-    "cthangover_game>=1"
+    "cthangover_game>=0.1.0"
   ]
 }
