@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "author": "ct",
   "description": "Dialog engine: the dialog box with portraits and answers, and the .scenario language in which every game of the collection tells its story.",
-  "category": "engine, library",
+  "categories": ["engine", "library"],
   "sources": [
     "src/**/*.cs"
   ],
