@@ -24,8 +24,8 @@ namespace Cthangover.Mods.Dialog.Executable
     /// publishers raise their event before storing the value), and a scan never
     /// runs inside the dialog runtime that ended a queue.
     /// <para/>
-    /// On _Ready the chain collects child ExecutableEvent nodes and replays a
-    /// pending scene switch (pending scene name from SceneManager). Exposes
+    /// On _Ready the chain collects child ExecutableEvent nodes. ShellSession
+    /// owns readiness and pending scene replay, including shells without dialogs. Exposes
     /// LastBackgroundID so action commands can remember which background was
     /// active for scene restore on revisit. AddEvent/RemoveEvent/ClearEvents allow
     /// dynamic event management via code. Events are checked in insertion order;
@@ -143,16 +143,6 @@ namespace Cthangover.Mods.Dialog.Executable
 				}
 			}
 
-			ModEventBus.Publish(new ShellReadyEvent { Root = this });
-
-			var sceneManager = GetNodeOrNull<SceneManager>("/root/SceneManager");
-			if (sceneManager != null && !string.IsNullOrEmpty(sceneManager.PendingSceneName))
-			{
-				var pending = sceneManager.PendingSceneName;
-				GameLogger.Log("CHAIN", $"_Ready: deferring SwitchScene('{pending}')");
-				sceneManager.PendingSceneName = null;
-				Callable.From(() => sceneManager.SwitchScene(pending)).CallDeferred();
-			}
 
 			RequestScan();
 			GameLogger.Log("CHAIN", $"_Ready: done, allEvents={allEvents.Count}");
