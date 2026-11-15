@@ -12,11 +12,10 @@ using Cthangover.Core.Interactive;
 namespace Cthangover.Mods.Dialog
 {
     /// <summary>
-    /// Thin wrapper node that hosts the dialog UI. The canvas instantiates its
-    /// <see cref="DialogBox"/> child at runtime from the core mod through
-    /// <see cref="ModScenePrefab"/> and keeps the well-known node name
-    /// <c>DialogBox</c>. The rest of the game locates it by that name via
-    /// <see cref="SceneContextNode.FindNode{T}"/>, not by hardcoded paths.
+    /// Thin wrapper node that hosts the dialog UI. The canvas instantiates its <see cref = "DialogBox"/> child at
+    /// runtime from the core mod through <see cref = "ModScenePrefab"/> and keeps the well-known node name
+    /// <c>DialogBox</c>. The rest of the game locates it by that name via <see cref =
+    /// "SceneContextNode.FindNode{T}"/>, not by hardcoded paths.
     /// </summary>
     public partial class DialogCanvas : Control
     {
@@ -24,16 +23,59 @@ namespace Cthangover.Mods.Dialog
 
         private DialogBox dialogBox;
 
-        /// <summary>The active DialogBox child, resolved in _Ready. Used by the scene tree root to access dialog without path traversal.</summary>
-        public DialogBox DialogBox => dialogBox;
+        /// <summary>
+        /// The active DialogBox child, resolved in _Ready. Used by the scene tree root to access dialog without
+        /// path traversal.
+        /// </summary>
+        public DialogBox DialogBox
+        {
+            get
+            {
+                return dialogBox;
+            }
+        }
 
-        /// <summary>Instantiates the <see cref="DialogBox"/> child from the core prefab when the scene does not ship one, keeping the well-known node name for path-free lookup.</summary>
+        /// <summary>
+        /// Releases only the supplied active presentation and installs the ordinary prefab. Optional factory
+        /// owners use this during unload: abort runs before freeing the UI so its camera and shell claims end.
+        /// A stale or foreign box leaves this canvas unchanged.
+        /// </summary>
+        public void ReleasePresentation(DialogBox owned)
+        {
+            if (dialogBox != owned || !GodotObject.IsInstanceValid(owned))
+            {
+                return;
+            }
+
+            owned.Abort();
+            owned.Free();
+            dialogBox = DialogBoxPrefab.Instantiate<DialogBox>();
+            if (dialogBox != null)
+            {
+                dialogBox.Name = "DialogBox";
+                AddChild(dialogBox);
+            }
+        }
+
+        /// <summary>
+        /// Instantiates the <see cref = "DialogBox"/> child from the core prefab when the scene does not ship one,
+        /// keeping the well-known node name for path-free lookup.
+        /// </summary>
         public override void _Ready()
         {
             dialogBox ??= GetNodeOrNull<DialogBox>("DialogBox");
             if (dialogBox == null)
             {
-                dialogBox = DialogBoxPrefab.Instantiate<DialogBox>();
+                foreach (var factory in DialogBoxFactoryConsumer.Factories)
+                {
+                    dialogBox = factory.Create(this);
+                    if (dialogBox != null)
+                    {
+                        break;
+                    }
+                }
+
+                dialogBox ??= DialogBoxPrefab.Instantiate<DialogBox>();
                 if (dialogBox != null)
                 {
                     dialogBox.Name = "DialogBox";
@@ -48,5 +90,4 @@ namespace Cthangover.Mods.Dialog
             MouseFilter = MouseFilterEnum.Ignore;
         }
     }
-
 }
