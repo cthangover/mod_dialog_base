@@ -19,7 +19,7 @@ namespace Cthangover.Mods.Dialog.Action.Impls
     /// following <c>delay</c> like any other advance. OnStartCallback/OnFinishCallback
     /// bracket the animation for setup/teardown. Progress follows the controller's
     /// process delta, so the timeline lasts WaitTime seconds of game time at any frame
-    /// rate (and scales with <c>Engine.TimeScale</c> exactly like <c>delay</c> timers).
+    /// rate (and scales with <c>Godot.Engine.TimeScale</c> exactly like <c>delay</c> timers).
     /// </summary>
     public class ActionTimedUpdate : ActionCommand, IOnUpdateEvent
     {

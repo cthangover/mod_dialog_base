@@ -27,7 +27,7 @@ namespace Cthangover.Mods.Dialog.Tests
         public ViewBox View { get; private set; }
 
         /// <summary>The running scene tree.</summary>
-        public static SceneTree Tree => (SceneTree)Engine.GetMainLoop();
+        public static SceneTree Tree => (SceneTree)Godot.Engine.GetMainLoop();
 
         /// <summary>Builds the host and the dialog box and waits a frame for their <c>_Ready</c>.</summary>
         public static async Task<DialogStage> Create()
