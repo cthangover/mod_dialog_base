@@ -54,6 +54,12 @@ namespace Cthangover.Mods.Dialog.Scenarios
             foreach (var kvp in ModRegistry.Instance.Mods)
             {
                 var text = kvp.Value.FileProvider.ReadFileText(path);
+                // These legacy consumers read raw scripts. Only a declared include mode opts into resolution.
+                if (text != null && ScenarioMetadata.ParseMetadata(text).metadata.ContainsKey("include_syntax"))
+                {
+                    text = ModManager.Instance.ReadResolvedText(kvp.Key, path, kvp.Value.FileProvider);
+                }
+
                 if (text != null)
                     return Convert(text);
             }
